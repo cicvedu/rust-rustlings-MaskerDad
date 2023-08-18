@@ -10,38 +10,96 @@
 //
 // Execute `rustlings hint rc1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+use std::rc::Rc;
 
-// threads1.rs
-// Execute `rustlings hint threads1` or use the `hint` watch subcommand for a hint.
-// This program should wait until all the spawned threads have finished before exiting.
+#[derive(Debug)]
+struct Sun {}
 
+#[derive(Debug)]
+enum Planet {
+    Mercury(Rc<Sun>),
+    Venus(Rc<Sun>),
+    Earth(Rc<Sun>),
+    Mars(Rc<Sun>),
+    Jupiter(Rc<Sun>),
+    Saturn(Rc<Sun>),
+    Uranus(Rc<Sun>),
+    Neptune(Rc<Sun>),
+}
 
-use std::thread;
-use std::time::Duration;
-
+impl Planet {
+    fn details(&self) {
+        println!("Hi from {:?}!", self)
+    }
+}
 
 fn main() {
+    let sun = Rc::new(Sun {});
+    println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
 
-    let mut handles = vec![];
-    for i in 0..10 {
-        
-        let handle= thread::spawn(move || {
-            thread::sleep(Duration::from_millis(250));
-            println!("thread {} is complete", i);
-        });
-        handles.push(handle);
-    }
+    let mercury = Planet::Mercury(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
+    mercury.details();
 
-    let mut completed_threads = 0;
-    for handle in handles {
-        // TODO: a struct is returned from thread::spawn, can you use it?
-        handle.join().unwrap();
-        completed_threads += 1;
-    }
+    let venus = Planet::Venus(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
+    venus.details();
 
-    if completed_threads != 10 {
-        panic!("Oh no! All the spawned threads did not finish!");
-    }
-    
+    let earth = Planet::Earth(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
+    earth.details();
+
+    let mars = Planet::Mars(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 5 references
+    mars.details();
+
+    let jupiter = Planet::Jupiter(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 6 references
+    jupiter.details();
+
+    // TODO
+    let saturn = Planet::Saturn(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
+    saturn.details();
+
+    // TODO
+    let uranus = Planet::Uranus(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
+    uranus.details();
+
+    // TODO
+    let neptune = Planet::Neptune(Rc::clone(&sun));
+    println!("reference count = {}", Rc::strong_count(&sun)); // 9 references
+    neptune.details();
+
+    assert_eq!(Rc::strong_count(&sun), 9);
+
+    drop(neptune);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
+
+    drop(uranus);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
+
+    drop(saturn);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 6 references
+
+    drop(jupiter);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 5 references
+
+    drop(mars);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
+
+    // TODO
+    drop(earth);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
+
+    // TODO
+    drop(venus);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
+
+    // TODO
+    drop(mercury);
+    println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
+
+    assert_eq!(Rc::strong_count(&sun), 1);
 }

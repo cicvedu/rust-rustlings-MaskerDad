@@ -10,8 +10,6 @@
 //
 // Make the code compile and the tests pass.
 
-// I AM NOT DONE
-
 macro_rules! my_macro {
     () => {
         println!("Check out my macro!");
