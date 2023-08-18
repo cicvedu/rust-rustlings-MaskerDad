@@ -12,67 +12,37 @@
 //
 // Execute `rustlings hint cow1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
-use std::borrow::Cow;
+// threads1.rs
+// Execute `rustlings hint threads1` or use the `hint` watch subcommand for a hint.
+// This program should wait until all the spawned threads have finished before exiting.
 
-fn abs_all<'a, 'b>(input: &'a mut Cow<'b, [i32]>) -> &'a mut Cow<'b, [i32]> {
-    for i in 0..input.len() {
-        let v = input[i];
-        if v < 0 {
-            // Clones into a vector if not already owned.
-            input.to_mut()[i] = -v;
-        }
-    }
-    input
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use std::thread;
+use std::time::Duration;
 
-    #[test]
-    fn reference_mutation() -> Result<(), &'static str> {
-        // Clone occurs because `input` needs to be mutated.
-        let slice = [-1, 0, 1];
-        let mut input = Cow::from(&slice[..]);
-        match abs_all(&mut input) {
-            Cow::Owned(_) => Ok(()),
-            _ => Err("Expected owned value"),
-        }
+
+fn main() {
+
+    let mut handles = vec![];
+    for i in 0..10 {
+        
+        let handle= thread::spawn(move || {
+            thread::sleep(Duration::from_millis(250));
+            println!("thread {} is complete", i);
+        });
+        handles.push(handle);
     }
 
-    #[test]
-    fn reference_no_mutation() -> Result<(), &'static str> {
-        // No clone occurs because `input` doesn't need to be mutated.
-        let slice = [0, 1, 2];
-        let mut input = Cow::from(&slice[..]);
-        match abs_all(&mut input) {
-            // TODO
-        }
+    let mut completed_threads = 0;
+    for handle in handles {
+        // TODO: a struct is returned from thread::spawn, can you use it?
+        handle.join().unwrap();
+        completed_threads += 1;
     }
 
-    #[test]
-    fn owned_no_mutation() -> Result<(), &'static str> {
-        // We can also pass `slice` without `&` so Cow owns it directly. In this
-        // case no mutation occurs and thus also no clone, but the result is
-        // still owned because it was never borrowed or mutated.
-        let slice = vec![0, 1, 2];
-        let mut input = Cow::from(slice);
-        match abs_all(&mut input) {
-            // TODO
-        }
+    if completed_threads != 10 {
+        panic!("Oh no! All the spawned threads did not finish!");
     }
-
-    #[test]
-    fn owned_mutation() -> Result<(), &'static str> {
-        // Of course this is also the case if a mutation does occur. In this
-        // case the call to `to_mut()` returns a reference to the same data as
-        // before.
-        let slice = vec![-1, 0, 1];
-        let mut input = Cow::from(slice);
-        match abs_all(&mut input) {
-            // TODO
-        }
-    }
+    
 }
